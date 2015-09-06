@@ -15,27 +15,24 @@ class HomeViewController: UIViewController, MKMapViewDelegate, CLLocationManager
     @IBOutlet weak var propertyMapView: MKMapView!
     
     let locationManager = CLLocationManager()
-
+    var annotations: [PropertyAnnotation]!
+    var selectedProperty: PropertyAnnotation!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        pullLocationsAPI()
+
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.initLocationManager()
-        initMap()
+        pullLocationsAPI()
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    
-    func initMap() {
-        var tAnnotation = self.getPropertyAnnotations()
-        propertyMapView.addAnnotation(tAnnotation)
-        var location: CLLocationCoordinate2D = tAnnotation.coordinate
-    }
+
     
     //------------------------------------------------------------------------------------------
     // LocationManager
@@ -53,12 +50,11 @@ class HomeViewController: UIViewController, MKMapViewDelegate, CLLocationManager
         var latitude: CLLocationDegrees = currentLocation.coordinate.latitude
         var longitude: CLLocationDegrees = currentLocation.coordinate.longitude
         var location: CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude, longitude)
-        var latDelta: CLLocationDegrees = 0.05
-        var lonDelta: CLLocationDegrees = 0.05
+        var latDelta: CLLocationDegrees = 0.2
+        var lonDelta: CLLocationDegrees = 0.2
         var span: MKCoordinateSpan = MKCoordinateSpanMake(latDelta, lonDelta)
         var region: MKCoordinateRegion = MKCoordinateRegionMake(location, span)
-        propertyMapView.setRegion(region, animated: true)
-        // propertyMapView.showsUserLocation = true
+        propertyMapView.setRegion(region, animated: false)
     }
     
     func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
@@ -73,29 +69,31 @@ class HomeViewController: UIViewController, MKMapViewDelegate, CLLocationManager
         if customizedView == nil {
             customizedView = MKAnnotationView(annotation: annotation, reuseIdentifier: "CustomizedPin")
             customizedView.image = UIImage(named: "bubble")
-            var priceLabel = UILabel(frame: CGRectMake(0, 0, 40, 30))
+            var priceLabel = UILabel(frame: CGRectMake(0, 0, 60, 40))
             priceLabel.textColor = UIColor.whiteColor()
             priceLabel.alpha = 0.8;
             priceLabel.tag = 42;
             customizedView.addSubview(priceLabel)
             customizedView.frame = priceLabel.frame
             customizedView.canShowCallout = true
-            customizedView.leftCalloutAccessoryView = UIImageView(frame: CGRectMake(0, 0, 40, 40))
+            customizedView.leftCalloutAccessoryView = UIImageView(frame: CGRectMake(0, 0, 50, 50))
         } else {
             customizedView.annotation = annotation
         }
         
         var label = customizedView.viewWithTag(42) as! UILabel
         label.textAlignment = .Center
-        label.text = "$20"
+        if let pAnnotation = annotation as? PropertyAnnotation {
+            label.text = pAnnotation.price
+        }
         return customizedView
     }
 
     func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
         if let calloutView = view.leftCalloutAccessoryView as? UIImageView {
-            calloutView.contentMode = .ScaleAspectFit
             if let propertyAnnotation = view.annotation as? PropertyAnnotation {
                 calloutView.image = propertyAnnotation.image
+                selectedProperty = propertyAnnotation
             }
         }
         view.rightCalloutAccessoryView = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
@@ -108,7 +106,9 @@ class HomeViewController: UIViewController, MKMapViewDelegate, CLLocationManager
     // MARK: - Navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "ShowProperty" {
-            
+            if let destVC = segue.destinationViewController as? PropertyDetailTableViewController {
+                destVC.selectedProperty = selectedProperty
+            }
         }
     }
     
@@ -122,10 +122,14 @@ class HomeViewController: UIViewController, MKMapViewDelegate, CLLocationManager
         self.performSegueWithIdentifier("filterSeg", sender: self)
     }
     
-    
     // implement APIControllerProtocal
     func didReceiveAPIResults(response: NSDictionary) {
-        println(response)
+        if let data = response["data"] as? [NSDictionary] {
+            self.annotations = getPropertyAnnotations(data)
+            propertyMapView.removeAnnotations(propertyMapView.annotations)
+            propertyMapView.addAnnotations(annotations)
+            propertyMapView.showAnnotations(annotations, animated: true)
+        }
     }
 
     func pullLocationsAPI() {
@@ -135,29 +139,38 @@ class HomeViewController: UIViewController, MKMapViewDelegate, CLLocationManager
         apiService.request(apiURL)
     }
     
-    func getPropertyAnnotations(locationJSONs: [NSDictionary]) -> PropertyAnnotation {
-        
-        var propertyAnnotation = PropertyAnnotation()
-        var imageLink = "https://upload.wikimedia.org/wikipedia/commons/9/95/Wells_Fargo_Center_2012-02-06.jpg"
-        var imageURL = NSURL(string: imageLink)
-        if let imageData = NSData(contentsOfURL: imageURL!) {
-            if let image = UIImage(data: imageData) {
-                propertyAnnotation.image = image
+    func getPropertyAnnotations(locationJSONs: [NSDictionary]) -> [PropertyAnnotation] {
+        var propertyAnnotations = [PropertyAnnotation] ()
+        for locationJSON in locationJSONs {
+            if let attributes = locationJSON["attributes"] as? NSDictionary {
+                var lat = attributes["lat"] as! NSString
+                var long = attributes["long"] as! NSString
+                var geoLocation = CLLocationCoordinate2D(latitude: lat.doubleValue, longitude: long.doubleValue)
+                var title = attributes["title"] as! String
+                var price = attributes["price"] as! String
+                var photoLinks = attributes["photos"] as! [String]
+                var propertyAnnotation = PropertyAnnotation()
+                propertyAnnotation.title = title
+                propertyAnnotation.price = price
+                propertyAnnotation.coordinate = geoLocation
+                propertyAnnotation.imageLinks = photoLinks
+                var imageURL = NSURL(string: photoLinks[0])
+                if let imageData = NSData(contentsOfURL: imageURL!) {
+                    if let image = UIImage(data: imageData) {
+                        propertyAnnotation.image = image
+                    }
+                }
+                propertyAnnotations.append(propertyAnnotation)
             }
         }
         
-        var propertyTitle = "New Orleans"
-        var latitude: CLLocationDegrees = 39.900411
-        var longitude: CLLocationDegrees = -75.172044
-        var geoLocation = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        propertyAnnotation.title = propertyTitle
-        propertyAnnotation.coordinate = geoLocation
-        
-        return propertyAnnotation
+        return propertyAnnotations
     }
     
     class PropertyAnnotation: MKPointAnnotation {
         var image: UIImage!
         var thumbLink: String!
+        var imageLinks: [String]!
+        var price: String!
     }
 }
