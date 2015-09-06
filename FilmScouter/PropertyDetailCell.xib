@@ -71,6 +71,9 @@
                     </mask>
                 </variation>
             </tableViewCellContentView>
+            <connections>
+                <outlet property="propertyTitle" destination="jQm-t2-V9M" id="Lpn-CR-2FN"/>
+            </connections>
             <point key="canvasLocation" x="282" y="242.5"/>
         </tableViewCell>
     </objects>

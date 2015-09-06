@@ -104,18 +104,21 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="defaultFilterCell" rowHeight="140" id="sju-LP-8M8">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="defaultFilterCell" rowHeight="150" id="sju-LP-8M8">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="sju-LP-8M8" id="EkI-5g-vd6">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="date" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="bLb-4j-Aqc">
-                                                    <rect key="frame" x="140" y="-11.5" width="320" height="162"/>
+                                                    <rect key="frame" x="140" y="-6.5" width="320" height="162"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="463195835.69331801">
                                                         <!--2015-09-06 01:30:35 +0000-->
                                                     </date>
-                                                    <date key="minimumDate" timeIntervalSinceReferenceDate="441802800">
-                                                        <!--2015-01-01 11:00:00 +0000-->
+                                                    <date key="minimumDate" timeIntervalSinceReferenceDate="462794400">
+                                                        <!--2015-09-01 10:00:00 +0000-->
+                                                    </date>
+                                                    <date key="maximumDate" timeIntervalSinceReferenceDate="-62577493438">
+                                                        <!--17-12-31 10:56:02 +0000-->
                                                     </date>
                                                 </datePicker>
                                             </subviews>
@@ -149,18 +152,21 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="endDatePickerCell" rowHeight="140" id="eqQ-Nq-Eee">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="endDatePickerCell" rowHeight="150" id="eqQ-Nq-Eee">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="eqQ-Nq-Eee" id="SMC-2Q-slN">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="date" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="I4x-rR-Kzm">
-                                                    <rect key="frame" x="140" y="-11.5" width="320" height="162"/>
+                                                    <rect key="frame" x="140" y="-6.5" width="320" height="162"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="463195835.69331801">
                                                         <!--2015-09-06 01:30:35 +0000-->
                                                     </date>
-                                                    <date key="minimumDate" timeIntervalSinceReferenceDate="441802800">
-                                                        <!--2015-01-01 11:00:00 +0000-->
+                                                    <date key="minimumDate" timeIntervalSinceReferenceDate="462794400">
+                                                        <!--2015-09-01 10:00:00 +0000-->
+                                                    </date>
+                                                    <date key="maximumDate" timeIntervalSinceReferenceDate="-62577493438">
+                                                        <!--17-12-31 10:56:02 +0000-->
                                                     </date>
                                                 </datePicker>
                                             </subviews>
@@ -214,7 +220,11 @@
                                 <segue destination="Q7R-Cn-ey5" kind="unwind" unwindAction="unwindToHomeViewController:" id="5VN-dh-fVI"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Done" id="Y83-OM-3uy"/>
+                        <barButtonItem key="rightBarButtonItem" title="Done" id="Y83-OM-3uy">
+                            <connections>
+                                <segue destination="Q7R-Cn-ey5" kind="unwind" unwindAction="unwindToHomeViewController:" id="GCZ-aE-VVF"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="endDatePicker" destination="I4x-rR-Kzm" id="6eM-OH-E0Y"/>

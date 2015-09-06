@@ -20,13 +20,12 @@ class HomeViewController: UIViewController, MKMapViewDelegate, CLLocationManager
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        pullLocationsAPI()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.initLocationManager()
-        pullLocationsAPI()
     }
 
     override func didReceiveMemoryWarning() {
@@ -151,7 +150,9 @@ class HomeViewController: UIViewController, MKMapViewDelegate, CLLocationManager
                 var photoLinks = attributes["photos"] as! [String]
                 var propertyAnnotation = PropertyAnnotation()
                 propertyAnnotation.title = title
-                propertyAnnotation.price = price
+                var prices = split(price) {$0 == ","}
+                var kPrice = prices[0]
+                propertyAnnotation.price = "$\(kPrice)K+"
                 propertyAnnotation.coordinate = geoLocation
                 propertyAnnotation.imageLinks = photoLinks
                 var imageURL = NSURL(string: photoLinks[0])

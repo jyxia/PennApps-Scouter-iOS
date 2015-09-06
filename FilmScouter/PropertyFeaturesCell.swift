@@ -1,17 +1,15 @@
 //
-//  PropertyDetailCell.swift
+//  PropertyFeaturesCell.swift
 //  FilmScouter
 //
-//  Created by Jinyue Xia on 9/5/15.
+//  Created by Jinyue Xia on 9/6/15.
 //  Copyright (c) 2015 Jinyue Xia. All rights reserved.
 //
 
 import UIKit
 
-class PropertyDetailCell: UITableViewCell {
+class PropertyFeaturesCell: UITableViewCell {
 
-    @IBOutlet weak var propertyTitle: UILabel!
-    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

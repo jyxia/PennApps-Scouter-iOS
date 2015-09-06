@@ -31,7 +31,7 @@ class PropertyDetailTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return 3
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -46,7 +46,14 @@ class PropertyDetailTableViewController: UITableViewController {
             let cellNib = UINib(nibName: "PropertyDetailCell", bundle: NSBundle.mainBundle())
             tableView.registerNib(cellNib, forCellReuseIdentifier: "propertyDetailCell")
             var propertyDetailCell = tableView.dequeueReusableCellWithIdentifier("propertyDetailCell", forIndexPath: indexPath) as! PropertyDetailCell
+            initDetailCellView(propertyDetailCell)
             return propertyDetailCell
+        }
+        if indexPath.row == 2 {
+            let cellNib = UINib(nibName: "PropertyFeaturesCell", bundle: NSBundle.mainBundle())
+            tableView.registerNib(cellNib, forCellReuseIdentifier: "propertyFeaturesCell")
+            var propertyFeaturesCell = tableView.dequeueReusableCellWithIdentifier("propertyFeaturesCell", forIndexPath: indexPath) as! PropertyFeaturesCell
+            return propertyFeaturesCell
         }
         var cell = tableView.dequeueReusableCellWithIdentifier("defaultcell", forIndexPath: indexPath) as! UITableViewCell
         return cell
@@ -61,19 +68,25 @@ class PropertyDetailTableViewController: UITableViewController {
         cell.imageScrollView.contentSize = CGSizeMake(imageWidth * 2, imageHeight)
         cell.imageScrollView.pagingEnabled = true
         
-        var xPos: CGFloat = 0.0
-        var image1 = UIImage(named: "pop")
-        var image2 = UIImage(named: "pop")
-        images.append(image1!)
-        images.append(image2!)
+        var xPos: CGFloat = 0.0     
+        var imageLinks = self.selectedProperty.imageLinks
         
-        for image in images {
+        for link in imageLinks {
             var imageView = UIImageView(frame: CGRectMake(xPos, 0.0, imageWidth, imageHeight))
             imageView.contentMode = .ScaleAspectFit
-            imageView.image = image
-            cell.imageScrollView.addSubview(imageView)
-            xPos += imageWidth;
+            var imageURL = NSURL(string: link)
+            if let imageData = NSData(contentsOfURL: imageURL!) {
+                if let image = UIImage(data: imageData) {
+                    imageView.image = image
+                    cell.imageScrollView.addSubview(imageView)
+                    xPos += imageWidth;
+                }
+            }
         }
+    }
+    
+    func initDetailCellView(cell: PropertyDetailCell) {
+        cell.propertyTitle.text = selectedProperty.title
     }
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -82,9 +95,16 @@ class PropertyDetailTableViewController: UITableViewController {
         }
         
         return 44.0
-        
     }
     
+    func loadImage(url: String, imageView: UIImageView) {
+        var imageURL = NSURL(string: url)
+        if let imageData = NSData(contentsOfURL: imageURL!) {
+            if let image = UIImage(data: imageData) {
+                imageView.image = image
+            }
+        }
+    }
     
     /*
     // MARK: - Navigation
